@@ -1,0 +1,35 @@
+div.calYear p,div.calMonth p {
+    display: inline;
+}
+
+div.calYear, div.calMonth {
+    text-align: center;
+    font-size: 2.0em;
+}
+
+table {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    height: 80%;
+    table-layout: fixed;
+}
+
+table tr th{
+    border: 1px solid #444444;
+    text-align: center;
+    height: 2em;
+}
+
+.dayItem{
+    border: 1px solid #444444;
+    vertical-align: top;
+    text-align: center;
+    padding-top: 10px;
+}
+.dayContent{
+    margin-top: 10px;
+    overflow: hidden;
+    height: 3em;
+}

@@ -1,0 +1,30 @@
+.rowPlan{
+    width: 95%;
+    height: 20%;
+    background-color:darkgray;
+    margin-top: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+.c1{    
+    width: 55%;
+    display:inline-block;
+}
+.c2{
+    text-align: center;
+    vertical-align: top;
+    width: 25%;
+    display:inline-block;
+}
+.c3{
+    text-align: center;
+    width: 10%;
+    display:inline-block;
+}
+.c3 input{
+    margin-bottom: 10px;
+}
+
+#addBtn{
+    margin-top: 10px;
+}
