@@ -2,16 +2,61 @@
     <head>
         <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/calendar.css">
         <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="<?php echo base_url(); ?>assets/js/calendar.js"></script>
         <script type="text/javascript">
         
                 // $(document).ready(function(){
                 //         var tt = document.getElementById('test');     
                 // });
+                $(function () {
+                const JANURARY = 1
+                const DECEMBER = 12
+                var date = new Date()
+                var d = date.getDate(),
+                        m = date.getMonth(),
+                        y = date.getFullYear()
 
-                const JANURARY = 1;
-                const DECEMBER = 12;
-                var year;
-                var month;
+                $('#calendar').fullCalendar({
+                        header    : {
+                                left  : 'prev,next today',
+                                center: 'title',
+                                right : 'month,agendaWeek,agendaDay'
+                        },
+                        buttonText: {
+                                today: 'today',
+                                month: 'month',
+                                week : 'week',
+                                day  : 'day'
+                        },
+                        
+                        editable  : true,
+                        droppable : true, // this allows things to be dropped onto the calendar !!!
+                        drop      : function (date, allDay) { // this function is called when something is dropped
+
+                                // retrieve the dropped element's stored Event Object
+                                var originalEventObject = $(this).data('eventObject')
+
+                                // we need to copy it, so that multiple events don't have a reference to the same object
+                                var copiedEventObject = $.extend({}, originalEventObject)
+
+                                // assign it the date that was reported
+                                copiedEventObject.start           = date
+                                copiedEventObject.allDay          = allDay
+                                copiedEventObject.backgroundColor = $(this).css('background-color')
+                                copiedEventObject.borderColor     = $(this).css('border-color')
+
+                                // render the event on the calendar
+                                // the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
+                                $('#calendar').fullCalendar('renderEvent', copiedEventObject, true)
+
+                                // is the "remove after drop" checkbox checked?
+                                if ($('#drop-remove').is(':checked')) {
+                                        // if so, remove the element from the "Draggable Events" list
+                                        $(this).remove()
+                                }
+
+                        }
+                })
                 function arrow_listener(event){
                         switch(event.target.id){
                                 case 'prev_year':
@@ -48,25 +93,27 @@
                         var date = year+"-"+month+"-"+day;
                         window.open("Plan/show_with_date/"+date,"","width=400,height=400, left=100, top=50");
                 }
-
-                document.addEventListener("DOMContentLoaded", function(){
-                // Handler when the DOM is fully loaded
-                        document.getElementById('prev_year').addEventListener('click', arrow_listener);
-                        document.getElementById('prev_month').addEventListener('click', arrow_listener);
-                        document.getElementById('next_year').addEventListener('click', arrow_listener);
-                        document.getElementById('next_month').addEventListener('click', arrow_listener);
-                        var userSelection = document.getElementsByClassName('dayItem');
-                        for(var i = 0; i < userSelection.length; i++) {
-                                        userSelection[i].addEventListener('click', show_plans);
-                        }
-                });
-
+             
+                document.getElementById('prev_year').addEventListener('click', arrow_listener);
+                document.getElementById('prev_month').addEventListener('click', arrow_listener);
+                document.getElementById('next_year').addEventListener('click', arrow_listener);
+                document.getElementById('next_month').addEventListener('click', arrow_listener);
+                var userSelection = document.getElementsByClassName('dayItem');
+                for(var i = 0; i < userSelection.length; i++) {
+                                userSelection[i].addEventListener('click', show_plans);
+                }
+        
+        })
         </script>
             <title>My Blog</title>
     </head>
     <body>
         <!-- <button type="button" class="btn btn-success">Success</button>
         <button class="btn btn-default" type="submit">Button</button> -->
+        <div class="col-md-9">
+                <!-- THE CALENDAR -->
+                <div id="calendar" class="fc fc-unthemed fc-ltr"></div>
+        </div>
         <div class="calDate">
                 <div class="calYear">
                         <a id="prev_year" href="#"><</a>
