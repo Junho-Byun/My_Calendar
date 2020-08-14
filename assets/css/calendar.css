@@ -1,14 +1,4 @@
-div.calYear p,div.calMonth p {
-    display: inline;
-}
-
-div.calYear, div.calMonth {
-    text-align: center;
-    font-size: 2.0em;
-}
-
-table {
-    margin-top: 20px;
+.calendarTable {
     margin-left: auto;
     margin-right: auto;
     width: 80%;
@@ -16,20 +6,60 @@ table {
     table-layout: fixed;
 }
 
-table tr th{
-    border: 1px solid #444444;
-    text-align: center;
-    height: 2em;
+.daysInLastMonth {
+    color: #919191    
 }
 
-.dayItem{
-    border: 1px solid #444444;
-    vertical-align: top;
-    text-align: center;
-    padding-top: 10px;
+.daysInNextMonth {
+    color: #919191    
 }
-.dayContent{
-    margin-top: 10px;
-    overflow: hidden;
-    height: 3em;
+
+.header{
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    height: 5%;
+}
+
+.header-left-value{
+    display: inline;
+    margin: 5px;
+}
+
+.header-left{
+    display: inline-block;
+    text-align: center;
+    width: 33%;
+    height: 100%;
+}
+.header-center{
+    display: inline-block;
+    width: 33%;
+}
+.header-center-btn{
+    width: 20%;
+    margin:10px;
+}
+
+.header-right{
+    display: inline-block;
+    text-align: center;
+    width: 33%;
+    height: 100%;
+}
+.header-right-arrow{
+    width: 33%;
+    margin: 10px;
+}
+
+.col{
+    vertical-align: top;
+    text-align: right;
+    padding: 10px;
+    border: 1px solid #444444;
+    height: 2em;
+}
+.col.daysInThisMonth.today{
+    background-color: #fcf8e3;
 }

@@ -222,24 +222,44 @@
                     var el = this.el;
                     var date = this.date;
                     var tableHTML;
-                    tableHTML = this.initialise(date.getFullYear(), date.getMonth()+1, date.getDate());
+                    tableHTML = this.initialise(date.getFullYear(), date.getMonth(), date.getDate());
 
                     el.append(tableHTML);
+
+                    this.initEventOnHeader();
                 };
 
+                Calendar.prototype.updateCalendar = function (y, m){
+                    $('.header-left-value.month').text(m+1);
+                    $('.header-left-value.year').text(y);
+                    $('.calendar-body').replaceWith(this.updateTableHTML(y, m));
+                };
+                Calendar.prototype.updateTableHTML = function(y, m){
+                    var calBody = ''+ this.renderTableBodyHtml(y,m);
+
+                    return calBody;
+
+                }
                 Calendar.prototype.initialise = function (y, m, d){
                     return this.renderTableHTML(y, m);
                 };
                 Calendar.prototype.renderTableHTML = function(y, m){
-                    var hTML = ''+'<table class="calendarTable">'+
-                                    '<thead>'+
-                                        '<tr>'+
-                                            this.renderTableHeadHtml()+
-                                        '</tr>'+
-                                            this.renderTableBodyHtml(y,m);
-                                    '</thead>'+
-                                '</table>';
-                    return hTML;
+                    var htmls = [];
+                    var header = this.renderHeader();
+                    var calender = ''+ '<div id="container">'+
+                                            '<table class="calendarTable">'+
+                                                '<thead>'+
+                                                    '<tr>'+
+                                                        this.renderTableHeadHtml()+
+                                                    '</tr>'+
+                                                '</thead>'+
+                                                this.renderTableBodyHtml(y,m)+
+                                            '</table>'+
+                                        '</div>';
+                    htmls.push(header);
+                    htmls.push(calender);
+
+                    return htmls.join('');
 
                 }
                 Calendar.prototype.renderTableHeadHtml = function(){
@@ -251,14 +271,14 @@
                         str = '<td>'+dayArr[i]+'</td>';
                         htmls.push(str);
                     }
-                    return htmls;
+                    return htmls.join('');
                 }
                 Calendar.prototype.makeCalendarBodyData = function (y, m){
                     var dateArr = [];
                     var dayData = new Object();
 
                     // 시작 일 전 달 일 채우기
-                    var daysPre = this.getNumOfDaysPre(y, m)
+                    var daysPre = this.getNumOfDaysPre(y, m);
                     for(i = this.getSdowIndex(y,m)-1 ; i>=0; i--){
                         dateArr[i] = [daysPre, -1];
                         daysPre--;
@@ -281,63 +301,232 @@
 
                     return dateArr;
                 }
-
-                Calendar.prototype.makeCalendarTdTag = function(data){
+                Calendar.prototype.makeCalendarColTdTag = function(data){
+                    var date = this.date;
+                    var year = date.getFullYear();
+                    var month = date.getMonth();
+                    
                     if(data[1] == -1){
+                        date = this.getPreMonthDate(year, month, data[0]);
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
                         return ''+
-                            '<td class="daysInLastMonth">'+
-                            data[0] +
+                            '<td class="col daysInLastMonth" data-date="' + dateStr + '">'+
+                                data[0]+                                        
                             '</td>';
                     } else if(data[1] == 0){
-                        return ''+
-                            '<td class="daysInThisMonth">'+
+                        date = new Date();
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
+                        if(data[0]==date.getDate()){
+                            if(this.date.getFullYear() == date.getFullYear() && this.date.getMonth() == date.getMonth()){
+                                return ''+
+                                '<td class="col daysInThisMonth today" data-date="' + dateStr + '">'+
+                                data[0] +
+                                '</td>';
+                            }
+                            return ''+
+                            '<td class="col daysInThisMonth" data-date="' + dateStr + '">'+
                             data[0] +
                             '</td>';
+                        }else{
+                            return ''+
+                            '<td class="col daysInThisMonth" data-date="' + dateStr + '">'+
+                            data[0] +
+                            '</td>';
+                        }
                     } else{ //data[1] == 1 
+                        date = this.getNextMonthDate(year, month, data[0]);
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
                         return ''+
-                            '<td class="daysInNextMonth">'+
+                            '<td class="col daysInNextMonth" data-date="' + dateStr + '">'+
                             data[0] +
                             '</td>';
                     }
+
+                }
+                Calendar.prototype.makeCalendarColThTag = function(data){
+                    var date = this.date;
+                    var year = date.getFullYear();
+                    var month = date.getMonth();
+                    
+                    if(data[1] == -1){
+                        date = this.getPreMonthDate(year, month, data[0]);
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
+                        return ''+
+                            '<th class="col daysInLastMonth" data-date="' + dateStr + '">'+
+                                data[0]+                                        
+                            '</th>';
+                    } else if(data[1] == 0){
+                        date = new Date();
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
+                        if(data[0]==date.getDate()){
+                            if(this.date.getFullYear() == date.getFullYear() && this.date.getMonth() == date.getMonth()){
+                                return ''+
+                                '<th class="col daysInThisMonth today" data-date="' + dateStr + '">'+
+                                data[0] +
+                                '</th>';
+                            }
+                            return ''+
+                            '<th class="col daysInThisMonth" data-date="' + dateStr + '">'+
+                            data[0] +
+                            '</th>';
+                        }else{
+                            return ''+
+                            '<th class="col daysInThisMonth" data-date="' + dateStr + '">'+
+                            data[0] +
+                            '</th>';
+                        }
+                    } else{ //data[1] == 1 
+                        date = this.getNextMonthDate(year, month, data[0]);
+                        var dateStr = date.getFullYear()+"-"+date.getMonth()+"-"+data[0];
+                        return ''+
+                            '<th class="col daysInNextMonth" data-date="' + dateStr + '">'+
+                            data[0] +
+                            '</th>';
+                    }
+
+                }
+
+                Calendar.prototype.makeCalendarColTag = function(data){
+                    var ths = [];
+                    for(i = 0 ; i < data.length ; i++){
+                        ths.push(this.makeCalendarColThTag(data[i]));
+                    }
+                    var htmls = ''+
+                                '<table>'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            ths.join('');
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>'+
+                                        '<tr>'+
+                                            1
+                                        '</tr>'+
+                                    '</tbody>'+
+                                '</table>';
+                    
+                    return htmls;
+
                 }
 
                 Calendar.prototype.renderTableBodyHtml = function(y, m){
                     var days = this.makeCalendarBodyData(y, m); //array
-                    var nOWs = this.getNumOfWeeks(y,m);
+
                     var htmls = [];
                     htmls.push('<tr>');
-                    for (i = 0 ; i < days.length ; i++){
-                        htmls.push(this.makeCalendarTdTag(days[i]));
+                    var i = 0
+                    for (; i < days.length ; ){
+                        dataArray = [];
+                        for(k = i ; (k+1)%8!=0 ; ){
+                            dataArray.push(days[k]);
+                            i++;
+                            k++;
+                        }
+                        htmls.push(this.makeCalendarColTag(dataArray));
                         if(i == days.length-1){
                             htmls.push('</tr>');
-                        } else if(i%7 == 6){
+                        } else{
                             htmls.push('</tr><tr>');
                         }
+                        if(i>days.lengh)
+                            break;
                     }
                 
                     return ''+
-                        '<tbody>'+ 
+                        '<tbody class="calendar-body">'+ 
                             htmls.join('')+
                         '</tbody>';
                 }
 
+                Calendar.prototype.renderHeader = function() {
+                    var htmls = [];
+
+                    var leftHeader = '<span class="h header-left">'+
+                                        '<h2 class="header-left-value month">'+(this.date.getMonth()+1)+'</h2>'+
+                                        '<h2 class="header-left-value year">'+this.date.getFullYear()+'</h2>'+
+                                    '</span>';
+                    var centerHeader = '<span class="h header-center">'+
+                                            '<input class="header-center-btn day" type="button" value="day" >'+
+                                            '<input class="header-center-btn week" type="button" value="week" >'+
+                                            '<input class="header-center-btn month" type="button" value="month" >'+
+                                        '</span>';
+                    var rightHeader = '<span class="h header-right">'+
+                                        '<input class="header-right-arrow left" type="button" value="<" >'+
+                                        '<input class="header-right-arrow right" type="button" value=">" >'+
+                                    '</span>';
+
+                    htmls.push('<div = class="header">');
+                    htmls.push(leftHeader);
+                    htmls.push(centerHeader);
+                    htmls.push(rightHeader);
+                    htmls.push('</div>');
+
+                    return htmls.join('');
+                }
+                
+                Calendar.prototype.initEventOnHeader = function(){
+                    var _this = this;
+                    $('.header-right-arrow').on('click', function(event){
+                        var date = _this.date;
+                        var month = date.getMonth();
+                        var year = date.getFullYear();
+                        switch(event.target.classList[1]){
+                            case 'right':{
+                                if(month==11){
+                                    year += 1
+                                    month = 0;
+                                }else{
+                                    month += 1;
+                                }
+                                break;
+                            }
+                            case 'left':{
+                                if(month==0){
+                                    year -= 1;
+                                    month = 11;
+                                }else{
+                                    month -= 1;
+                                }
+                            }
+                        }
+                        _this.date = new Date(year, month, 1);
+                        _this.updateCalendar(year, month);
+                    });
+                }
+
+                Calendar.prototype.renderFooter = function (){
+
+                }
+
                 // 한달에 몇 일?
                 Calendar.prototype.getNumOfDays = function(y, m){
-                    return (new Date(y, m, 0)).getDate();
+                    return (new Date(y, m+1, 0)).getDate();
                 }
                 // 전 달 
+                Calendar.prototype.getPreMonthDate = function(y, m, d){
+                    if(m==0)
+                        return new Date(y-1, 12, d);
+                    else 
+                        return new Date(y, m, d);
+                }
+                Calendar.prototype.getNextMonthDate = function(y, m, d){
+                    if(m=11)
+                        return new Date(y+1, 1, d);
+                    else 
+                        return new Date(y, m+2, d);
+                }
                 Calendar.prototype.getNumOfDaysPre = function(y, m){
                     if(m==0)
                         return (new Date(y-1, 12, 0)).getDate();
                     else 
-                        return (new Date(y, m-1, 0)).getDate();
+                        return (new Date(y, m, 0)).getDate();
                 }
                 // 다음 달 
                 Calendar.prototype.getNumOfDaysAfter = function(y, m){
                     if(m=11)
                         return (new Date(y+1, 1, 0)).getDate();
                     else 
-                        return (new Date(y, m+1, 0)).getDate();
+                        return (new Date(y, m+2, 0)).getDate();
                 }
 
                 // 시작 요일(start day of week)
@@ -346,7 +535,7 @@
                 };
                 // 0-6 sunday-Saturday
                 Calendar.prototype.getSdowIndex = function (y, m){
-                    var now = new Date(y + '-' + m + '-01');
+                    var now = new Date(y + '-' + (m+1) + '-01');
                     return now.getDay();
                 };
 
